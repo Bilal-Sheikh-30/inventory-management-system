@@ -1,0 +1,2 @@
+# stockminder
+inventory management system 
