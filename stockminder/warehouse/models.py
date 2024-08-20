@@ -22,8 +22,18 @@ class CustomUser(AbstractUser):
     registerDate = models.DateField(blank=True, null=True)
 
     def save(self, *args, **kwargs):
+        if self.pk is None:  # New user
+            if self.password:
+                self.set_password(self.password)
+        else:  # Existing user
+            old_user = CustomUser.objects.get(pk=self.pk)
+            if old_user.password != self.password:
+                self.set_password(self.password)
+
+        # Set the registerDate if status is not 'NA'
         if self.status != 'NA' and self.registerDate is None:
             self.registerDate = timezone.now()
+
         super().save(*args, **kwargs)
 
     def __str__(self):
@@ -111,6 +121,3 @@ class ItemLedger(models.Model):
     balance_issued = models.IntegerField()
     closing_balance = models.IntegerField()
     status = models.CharField(max_length=50)
-
-    
-
